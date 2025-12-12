@@ -22,7 +22,7 @@ if (!isset($_SESSION['email'])) {
 
 <body style="bacgkground:#fff;">
     <div class="box">
-        <h1>Welcome User</h1
+        <h1>Welcome User</h1>
         <p>This is the <span> user </span> page.</p>
         <button onclick="window.location.href='logout.php'">Logout</button>
 
