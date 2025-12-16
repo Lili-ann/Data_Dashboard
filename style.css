@@ -12,8 +12,17 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(to right, #5A0505, #d88383);
-    color: #333;
+    
+    /* 1. Combine Gradient + Image in one line */
+    /* 2. Use RGBA for transparency (0.8 = 80% opacity) */
+    background-image: 
+        linear-gradient(to right, rgba(90, 5, 5, 0.4), rgba(216, 131, 131, 0.4)),
+        url('images/library-2.png'); 
+
+    /* Standard settings */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 
@@ -30,13 +39,15 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     display: none;
+    color: #333; 
+    /* color added from vino's code (stella's note u can ignore) */
 }
 
 .form-box.active{
     display: block;
 }
 
-h2{
+.form-box h2{
     font-size: 2em;
     font-weight: 700;
     text-align: center;
@@ -44,8 +55,8 @@ h2{
     color: #7f0924;
 }
 
-input,
-select{
+.form-box input,
+.form-box select{
     width: 100%;
     padding: 12px;
     background: #f1d3db;
@@ -57,7 +68,7 @@ select{
     outline: none;
 }
 
-button{
+.form-box button{
     /* FIXED: Changed width and margin for better centering */
     width: 100%;
     margin: 0;
@@ -74,22 +85,29 @@ button{
     text-align:center;
 }
 
-button:hover{
+.form-box button:hover{
     background: #d5123f;
 }
 
-p{
+.form-box p{
     text-align: center;
     margin-top: 15px;
     font-size: 16px;
-    color: #555;
+    color: #434343;
 }
-p a{
+
+.form-box q{
+    text-align: center;
+    margin-top: 15px;
+    font-size: 16px;
+    color: #ffffff;
+}
+.form-box p a{
     color: #e12752;
     text-decoration: none;
     font-weight: 500;
 }
-p a:hover{
+.form-box p a:hover{
     text-decoration: underline;
 }
 
@@ -103,7 +121,7 @@ p a:hover{
     font-size: 13px;
 }
 
-h1{
+.form-box h1{
     font-size: 50px;
 }
 
@@ -119,4 +137,222 @@ span{
     display: block;
     width: 300px;
     margin: 0 auto;
+}
+
+/* =========================================
+   Custom style for all pages besides login
+   ========================================= */
+
+/* Gunakan class khusus 'user-body' agar tidak bentrok dengan login */
+body.user-body {
+    background-color: #f0f0f0;
+    /* Background Image */
+    background-image: url('images/library-2.png'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Agar background tetap saat scroll */
+    height: 100vh;
+    position: relative;
+    display: block; /* Override flex dari login page */
+}
+
+/* Overlay transparan */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(3px);
+    z-index: 1;
+}
+
+/* Ganti nama .container jadi .user-container agar tidak bentrok */
+.user-container {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0; /* Reset margin container login */
+}
+
+/* HEADER RED BAR AND TITLE */
+.header {
+    background-color: #600000; /* Deep Red */
+    color: white;
+    padding: 0 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    height: 70px;
+    display: flex; /* WAJIB ADA agar sejajar */
+    justify-content: space-between; /* Kiri - Tengah - Kanan */
+    align-items: center; /* Vertikal Center */
+    font-family: "Poppins", serif;
+}
+
+/* HEADER BACK AND LOGOUT */
+.header-btn {
+    color: white; /* Force warna putih */
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.header-btn.logout {
+    justify-content: flex-end; /* Rata kanan */
+}
+
+
+/* SCROLLABLE LIST AREA */
+.content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    padding-bottom: 100px; /* Space for bottom nav */
+}
+
+/* MEMBER CARDS */
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-family: 'Poppins', sans-serif;
+}
+
+.card-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+
+.student-name, .meeting-name {
+    font-size: 18px;
+    color: #222;
+    font-weight: 600;
+}
+
+.student-id, .meeting-time {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.card-right {
+    font-weight: bold;
+    color: #000;
+    font-size: 14px;
+}
+
+/* BOTTOM NAVIGATION */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #600000; /* Deep Red */
+    height: 80px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.nav-item {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    width: 50%;
+    height: 100%;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.nav-item i {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+/* =========================================
+   STYLE KHUSUS MEMBER DETAIL
+   ========================================= */
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Jarak antara foto dan teks */
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.profile-pic-box {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border: 5px solid #1e4d2b; /* Hijau tua sesuai gambar */
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.profile-pic-box i {
+    font-size: 60px;
+    color: black;
+}
+
+/* Teks Info (Name, ID, Role, Faculty) */
+.profile-info {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.profile-info strong {
+    font-weight: 600;
+}
+/* Tombol Status (Present/Upcoming) */
+.status-btn {
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 80px;
+}
+
+.status-present {
+    background-color: #600000; /* Merah Maroon */
+}
+
+.status-upcoming {
+    background-color: #600000; /* Merah Maroon (Sama kayak gambar) */
+}
+.section-title {
+    font-family: 'Poppins', sans-serif;
+    color: #600000; /* Deep Red to match theme */
+    font-size: 18px;
+    font-weight: 700;
+    margin: 20px 0 10px 0;
+    text-align: center;
 }
