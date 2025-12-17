@@ -49,12 +49,21 @@ function isActive($formName, $activeForm) {
             <h2>Register</h2>
             <?= showError($errors['register']) ?>
             <input type="text" name="name" placeholder="Username" required>
+              <select name="major" required>
+                <option value="">Select Major</option>
+                <option value="software engineering">Software Engineering</option>
+                <option value="data science">Data Science</option>
+                <option value="digital business">Digital Business</option>
+                <option value="information technology">Information Technology</option>
+                <option value="accounting">Accounting</option>
+            </select>
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
             <select name="role" required>
                 <option value="">Select Role</option>
-                <option value="user">User</option>
+                <option value="member">Member</option>
                 <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
             </select>
             <button type="submit" name="register">Register</button>
             <p> Already have an account? <a href="#" onclick="showform('login-form')">Login</a></p>

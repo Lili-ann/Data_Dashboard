@@ -3,7 +3,7 @@
 $host = 'localhost';
 $user ="root";
 $password = "";
-$dbname = "user_db";
+$dbname = "club_db";
 
 // FIXED: Changed $database to $dbname
 $conn = new mysqli($host, $user, $password, $dbname);
