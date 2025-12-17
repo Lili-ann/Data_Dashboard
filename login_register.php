@@ -91,16 +91,16 @@ if (isset($_POST['login'])) {
             $stmt_role->close();
 
             // 4. Set Session Variables
+            $_SESSION['id'] = $user['id'];      
             $_SESSION['name'] = $user['name'];  
             $_SESSION['email'] = $user['email']; 
-            $_SESSION['role'] = $user_role; // Important: Save role to session for security checks
+            $_SESSION['role'] = $user_role; 
 
-            // 5. Redirect based on role
              if (strtolower($user_role) == 'admin') {
                 header("Location: admin_page.php");
             
             } elseif (strtolower($user_role) == 'manager') {
-                header("Location: manager_page.php");
+                header("Location: meeting_list.php");
             
             } else {
                 // Default for 'member', 'officer', or 'user'

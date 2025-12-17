@@ -1,18 +1,19 @@
 <?php
 session_start();
 require_once 'config.php';
+
+// 1. Security Check
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
+// 2. Fetch Users and their Roles
 $sql = "SELECT user.id, user.name, role.role 
         FROM user 
-        JOIN role ON user.id = role.user_id";
+        LEFT JOIN role ON user.id = role.user_id";
 $result = $conn->query($sql);
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +23,6 @@ $result = $conn->query($sql);
     <title>Members List</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- This cdnjs.cloudfare is used instead of manually downloading all font awesome icons -->
 </head>
 
 <body class="user-body">
@@ -39,32 +39,34 @@ $result = $conn->query($sql);
 
         <div class="content">
             <?php 
-           // 2. CHECK IF USERS EXIST
             if ($result->num_rows > 0) {
-                // 3. LOOP THROUGH EACH USER
                 while($row = $result->fetch_assoc()) { 
                     $displayRole = !empty($row['role']) ? $row['role'] : 'Member';
             ?>
             
-            <a href="member_detail.php?id=<?php echo $row['id']; ?>" style="text-decoration:none; color:inherit;">
-                <div class="card">
-                    <div class="card-left">
-                        <span class="student-name"><?php echo $row['name']; ?></span>
-                        <span class="student-id"><?php echo $row['id']; ?></span>
-                    </div>
+            <div class="card">
+                <a href="member_detail.php?id=<?php echo $row['id']; ?>" class="card-left" style="text-decoration:none; color:inherit; flex: 1;">
+                    <span class="student-name"><?php echo htmlspecialchars($row['name']); ?></span>
+                    <span class="student-id"><strong>ID :</strong> <?php echo htmlspecialchars($row['id']); ?></span>
+                </a>
 
-                    <div class="card-right">
-                       <span class="role-badge <?php echo strtolower($displayRole); ?>">
-                            <?php echo htmlspecialchars($displayRole); ?>
-                        </span>
-                    </div>
+                <div class="card-right" style="display: flex; align-items: center; gap: 10px;">
+                    <span class="role-badge <?php echo strtolower($displayRole); ?>">
+                        <?php echo htmlspecialchars($displayRole); ?>
+                    </span>
+
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Manager'): ?>
+                        <a href="edit_member.php?id=<?php echo $row['id']; ?>" style="color: #790707ff; font-size: 1.1rem; padding: 5px;" title="Edit Member">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                    <?php endif; ?>
                 </div>
-            </a>
+            </div>
             
-          <?php 
+            <?php 
                 } 
             } else {
-                echo "<p style='text-align:center; margin-top:20px;'>No members found.</p>";
+                echo "<p style='text-align:center; margin-top:20px; color: #666;'>No members found.</p>";
             }
             ?>
         </div>

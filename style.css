@@ -170,17 +170,14 @@ body.user-body {
 
 /* Add to style.css */
 .role-badge.admin {
-    background: #ffffff; /* Red for admins */
     color: #de0000;
 }
 
 .role-badge.member {
-    background: #f1d3db; /* Light pink for users */
     color: #002fff;
 }
 
 .role-badge.manager {
-    background: #f1d3db; /* Light pink for users */
     color: #ff5900;
 }
 
