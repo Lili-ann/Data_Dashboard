@@ -14,8 +14,8 @@ $members_db = [
     1 => ['name' => 'Student 1', 'id' => '25001', 'role' => 'Admin',   'faculty' => 'Computer Science'],
     2 => ['name' => 'Student 2', 'id' => '25002', 'role' => 'Manager', 'faculty' => 'Business'],
     3 => ['name' => 'Student 3', 'id' => '25003', 'role' => 'Manager', 'faculty' => 'Engineering'],
-    4 => ['name' => 'Student 3', 'id' => '25004', 'role' => 'Member',  'faculty' => 'Arts'],
-    5 => ['name' => 'Student 4', 'id' => '25005', 'role' => 'Member',  'faculty' => 'Medicine'],
+    4 => ['name' => 'Student 4', 'id' => '25004', 'role' => 'Member',  'faculty' => 'Arts'],
+    5 => ['name' => 'Student 5', 'id' => '25005', 'role' => 'Member',  'faculty' => 'Medicine'],
 ];
 
 // Ambil data sesuai ID

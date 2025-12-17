@@ -238,7 +238,7 @@ body.user-body {
     gap: 2px;
 }
 
-.student-name, .meeting-name {
+.student-name, .meeting-title {
     font-size: 18px;
     color: #222;
     font-weight: 600;
@@ -250,7 +250,7 @@ body.user-body {
     margin-top: 2px;
 }
 
-.card-right {
+.card-right, .room-text {
     font-weight: bold;
     color: #000;
     font-size: 14px;
@@ -272,24 +272,50 @@ body.user-body {
     z-index: 10;
 }
 
-.nav-item {
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-    width: 50%;
-    height: 100%;
-    transition: 0.3s;
+/* --- BOTTOM NAVIGATION FIXES --- */
+
+/* 1. Reset the text color for navigation items AND FIX LAYOUT */
+.bottom-nav .nav-item {
+    /* --- ADD THESE 4 LINES TO FIX ALIGNMENT --- */
+    display: flex;              /* Enables flexible layout */
+    flex-direction: column;     /* Stacks Icon on Top, Text on Bottom */
+    align-items: center;        /* Centers them left-to-right */
+    justify-content: center;    /* Centers them top-to-bottom */
+    /* ------------------------------------------ */
     text-align: center;
+    
+    color: rgba(255, 255, 255, 0.6) !important; 
+    text-decoration: none;
+    transition: all 0.3s ease;
+    height: 100%; /* Ensures it uses the full height of the bar */
+    flex: 1; /* Ensures buttons share width equally */
 }
 
-.nav-item i {
-    font-size: 24px;
-    margin-bottom: 5px;
+/* 2. CRITICAL FIX: Force the SPAN (text) to be white, overriding the global red rule */
+.bottom-nav .nav-item span {
+    color: inherit !important; /* Inherit the white color from parent */
+    font-size: 11px; /* Keep text small */
+    line-height: 1.2; /* Better spacing for two lines */
+    margin-top: 4px;
+}
+
+/* 3. Ensure Icons match the text color */
+.bottom-nav .nav-item i {
+    color: inherit !important;
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+/* 4. Active State (The tab you are currently on) */
+.bottom-nav .nav-item.active {
+    color: #ffffff !important; /* Bright White */
+    transform: translateY(-2px); /* Slight "pop up" effect */
+    opacity: 1;
+}
+
+/* 5. Active State Text Styling */
+.bottom-nav .nav-item.active span {
+    font-weight: 700; /* Bold text for active tab */
 }
 
 /* =========================================
@@ -355,4 +381,142 @@ body.user-body {
     font-weight: 700;
     margin: 20px 0 10px 0;
     text-align: center;
+}
+
+/* ADMIN PAGE USAGE ONLY */
+
+/* The big frosted box */
+
+.logs-box {
+    background: rgba(255, 255, 255, 0.6); /* 85% Solid White */
+    padding: 20px;
+    border-radius: 15px; /* Rounded corners */
+    height: 400px; /* Fixed height */
+    overflow-y: auto; /* Adds scrollbar if list is too long */
+}
+
+.log-line {
+    padding: 8px 0;
+    border-bottom: 3px solid #ddd; /* Thin grey line between items */
+    font-size: 14px;
+}
+
+.darkred-name {
+    color: #6a1c1c; /* Gold color for names */
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.staff-name {
+    font-size: 18px;
+    color: #222;
+    font-weight: 600;
+}
+
+.staff-id {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* 1. The Card Container */
+.dropdowncard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Reduce side padding slightly for mobile screens to save space */
+    padding: 15px 15px; 
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    /* Essential to prevent clipping */
+    overflow: visible; 
+}
+
+/* 2. Left Side (Name & ID) - MADE RESPONSIVE */
+.dropdowncard-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    /* This allows the name section to shrink if the screen is tiny, 
+       preventing it from pushing the dropdown off-screen */
+    flex: 1; 
+    min-width: 0; 
+    margin-right: 10px; /* Add space between name and dropdown */
+}
+
+/* 3. The Dropdown Container */
+.select-wrapper {
+    position: relative;
+    width: 110px; 
+}
+
+.select-wrapper select {
+    width: 100%;
+    
+    /* Reset default browser styles */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: transparent;
+    border: none;
+    
+    font-size: 15px; 
+    font-weight: bold;
+    color: #000;
+    
+    /* --- THE FIX START --- */
+    
+    /* 1. Change direction to RTL. 
+       This forces the dropdown menu to anchor to the RIGHT edge 
+       and expand to the LEFT, keeping it on screen. */
+    direction: rtl; 
+    
+    /* 2. Add padding to the RIGHT to make space for the arrow.
+       (In RTL mode, the text starts from the right, so we push it over) */
+    padding-right: 25px; 
+    
+    /* --- THE FIX END --- */
+
+    cursor: pointer;
+    
+    /* Arrow Icon - Positioned on the Right */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    
+    /* 3. Ensure background arrow stays on the right */
+    background-position: right center; 
+    background-size: 10px;
+}
+
+/* Optional: Ensure the options inside read comfortably */
+.select-wrapper option {
+    direction: ltr; /* Keeps the text inside the list Left-to-Right */
+}
+
+/* --- 4. Save Button Styles --- */
+.save-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding-bottom: 80px; /* Extra padding so it doesn't hit the nav bar */
+}
+
+.btn-save {
+    background-color: white;
+    color: #8B0000; /* Deep Red Text */
+    border: none;
+    padding: 12px 60px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-save:active {
+    transform: scale(0.95);
 }
