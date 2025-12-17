@@ -2,7 +2,6 @@
 session_start();
 require_once 'config.php';
 
-// 1. Security Check
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
@@ -36,23 +35,21 @@ $result = $conn->query($sql);
     
     <div class="user-container">
         
-        <div class="header" style="position: relative; display: flex; justify-content: flex-end; align-items: center;">
+        <div class="header">
+            <?php if ($isAdmin): ?>
+                <a href="admin_page.php" class="header-btn">Back</a>
+            <?php else: ?>
+                 <a href="index.php" class="header-btn">Back</a>
+            <?php endif; ?>
             
-            <span style="position: absolute; left: 50%; transform: translateX(-50%); font-weight: bold; font-size: 1.2rem; color: #ffffff;">
-                Meeting List
-            </span>
-            
+            <div class="header-title">Meeting List</div>
             <a href="logout.php" class="header-btn logout">Logout</a>
-
         </div>
 
         <div class="content">
-            
             <?php if ($result->num_rows > 0): ?>
                 <?php while($row = $result->fetch_assoc()): ?>
-                
                 <div class="card">
-                    
                     <a href="attendance_list.php?id=<?php echo $row['id']; ?>" style="text-decoration: none; flex: 1; display: flex; color: inherit;">
                         <div class="card-left">
                             <span class="meeting-title"><?php echo htmlspecialchars($row['meeting_name']); ?></span>
@@ -61,7 +58,6 @@ $result = $conn->query($sql);
                             </span>
                         </div>
                     </a>
-
                     <div class="card-right">
                         <span class="room-text">
                             <i class="fa-solid fa-location-dot" style="margin-right:5px; color:#800000;"></i>
@@ -70,24 +66,51 @@ $result = $conn->query($sql);
                             ?>
                         </span>
                     </div>
-
                 </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p style="text-align: center; color: #666; margin-top: 20px;">No meetings found in database.</p>
+                <p style="text-align: center; color: #666; margin-top: 20px;">No meetings found.</p>
+            <?php endif; ?>
+
+            <?php if ($isAdmin): ?>
+                <div class="save-btn-container" style="margin-top: 20px; padding-bottom: 20px;">
+                    <a href="create_meeting.php" class="btn-save" style="text-decoration: none; display: inline-block;">
+                        <i class="fas fa-plus" style="margin-right: 8px;"></i> Create New Meeting
+                    </a>
+                </div>
             <?php endif; ?>
 
         </div> 
 
         <div class="bottom-nav">
-             <a href="user_page.php" class="nav-item">
-                <i class="fa-solid fa-user"></i>
-                <span class="nav-text">Member<br>List</span>
-            </a>
-            <a href="#" class="nav-item active">
-                <i class="fas fa-calendar-check"></i>
-                <span class="nav-text">Meeting<br>List</span>
-            </a>
+             <?php if ($isAdmin): // --- ADMIN NAV WITH ICONS --- ?>
+                
+                <a href="user_page.php" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span class="nav-text">Manage<br>members</span>
+                </a>
+
+                <a href="meeting_list.php" class="nav-item active">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="nav-text">Manage<br>schedule</span>
+                </a>
+
+                <a href="admin_logs.php" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="nav-text">View<br>Logs</span>
+                </a>
+
+            <?php else: // --- USER/MANAGER NAV --- ?>
+                <a href="meeting_list.php" class="nav-item active">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="nav-text">Meeting<br>List</span>
+                </a>
+                <a href="user_page.php" class="nav-item">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="nav-text">Member<br>List</span>
+                </a>
+
+            <?php endif; ?>
         </div>
 
     </div>

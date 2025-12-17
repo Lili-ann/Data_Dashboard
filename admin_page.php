@@ -1,82 +1,68 @@
 <?php
 session_start();
-if (!isset($_SESSION['email'])) {
+// 1. Security Check: Only Admins allowed
+if (!isset($_SESSION['email']) || !isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
     header("Location: index.php");
     exit();
 }
-$logs = [
-    ["name" => "Stella", "action" => "borrowed", "book" => "Physics CAMBRIDGE"],
-    ["name" => "Lilian", "action" => "borrowed", "book" => "Biology CAMBRIDGE"],
-    ["name" => "Rafdah", "action" => "returned", "book" => "CompSci CAMBRIDGE"],
-    ["name" => "JJ", "action" => "returned", "book" => "Mechanics CAMBRIDGE"],
-    ["name" => "Alvino", "action" => "borrowed", "book" => "Pure Maths CAMBRIDGE"],
-    ["name" => "Kenny", "action" => "borrowed", "book" => "Biology CAMBRIDGE"],
-    ["name" => "Shandy", "action" => "returned", "book" => "Business CAMBRIDGE"],
-];
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Hub</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 </head>
 
 <body class="user-body">
+
     <div class="overlay"></div>
+
     <div class="user-container">
         
-        <div class="header">
-            <div class="header-btn" style="cursor: default;"></div>
-            Admin Dashboard  
-            <a href="logout.php" class="header-btn logout">Logout</a>
+        <div class="header" style="justify-content: center;">
+            <div class="header-title">ADMIN HUB</div>
         </div>
 
-        <div class="content">
-            <h2 class="section-title">Logs</h2>
-
-            <div class="logs-box">
-
-                <?php foreach($logs as $item): ?>
-                    <div class="log-line">
-                        <span class="darkred-name"><?php echo $item['name']; ?></span>
-                        
-                        <?php echo $item['action']; ?> "<?php echo $item['book']; ?>"
-                        
-                    </div>
-                <?php endforeach; ?>
-
-            </div>
-            
-
+        <div class="content" style="display: flex; flex-direction: column; justify-content: center; padding-top: 50px;">
+    
+    <a href="user_page.php" class="card" style="text-decoration: none; cursor: pointer;">
+        <div class="card-left">
+            <span class="student-name">Manage Members</span>
         </div>
+    </a>
+
+    <a href="meeting_list.php" class="card" style="text-decoration: none; cursor: pointer;">
+        <div class="card-left">
+            <span class="student-name">Manage Schedule/Attendance</span>
+        </div>
+    </a>
+
+    <a href="admin_logs.php" class="card" style="text-decoration: none; cursor: pointer;">
+        <div class="card-left">
+            <span class="student-name">View Logs</span>
+        </div>
+    </a>
+
+    <a href="export_excel.php" class="card" style="text-decoration: none; cursor: pointer;">
+        <div class="card-left">
+            <span class="student-name">Download Whole Database</span>
+        </div>
+    </a>
+
+</div>
+
         <div class="bottom-nav">
-            <a href="manage_roles.php" class="nav-item">
-                <i class="fas fa-user-cog"></i> 
-                <span>Manage Roles</span>
-            </a>
-
-            <a href="modify_data.php" class="nav-item">
-                <i class="fas fa-pen-to-square"></i>
-                <span>Modify Data</span>
-            </a>
-
-            <a href="logout.php" class="nav-item">
+             <a href="logout.php" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
-            </a>
-
+             </a>
         </div>
 
     </div>
-    
-</body>
 
+</body>
 </html>

@@ -96,10 +96,10 @@ if (isset($_POST['login'])) {
             $_SESSION['email'] = $user['email']; 
             $_SESSION['role'] = $user_role; 
 
-            logActivity($conn, $user['id'], $user['name'], 'Login', 'User logged into the system.');
+            
 
              if (strtolower($user_role) == 'admin') {
-                header("Location: manage_roles.php");
+                header("Location: admin_page.php");
             
             } elseif (strtolower($user_role) == 'manager') {
                 header("Location: meeting_list.php");

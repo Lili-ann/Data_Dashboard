@@ -419,8 +419,9 @@ body.user-body {
     background: rgba(255, 255, 255, 0.6); /* 85% Solid White */
     padding: 20px;
     border-radius: 15px; /* Rounded corners */
-    height: 400px; /* Fixed height */
+    height: 600px; /* Fixed height */
     overflow-y: auto; /* Adds scrollbar if list is too long */
+    -webkit-overflow-scrolling: touch;
 }
 
 .log-line {
