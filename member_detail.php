@@ -11,7 +11,7 @@ if (!isset($_SESSION['email'])) {
 if (isset($_GET['id'])) {
     $id_requested = $_GET['id'];
 
-<<<<<<< HEAD
+    // --- PASTE THIS BLOCK IN ---
     $sql = "SELECT user.name, user.id, user.major, user.profile_pic, role.role 
         FROM user 
         LEFT JOIN role ON user.id = role.user_id 
@@ -21,24 +21,12 @@ if (isset($_GET['id'])) {
     $stmt->bind_param("i", $id_requested); // "i" means integer
     $stmt->execute();
     $result = $stmt->get_result();
-=======
-// 2. MOCK DATA MEMBER (Harus sama urutannya dengan user_page biar datanya nyambung)
-// Array key (1, 2, 3) disini berperan sebagai ID Database
-$members_db = [
-    1 => ['name' => 'Student 1', 'id' => '25001', 'role' => 'Admin',   'faculty' => 'Computer Science'],
-    2 => ['name' => 'Student 2', 'id' => '25002', 'role' => 'Manager', 'faculty' => 'Business'],
-    3 => ['name' => 'Student 3', 'id' => '25003', 'role' => 'Manager', 'faculty' => 'Engineering'],
-    4 => ['name' => 'Student 4', 'id' => '25004', 'role' => 'Member',  'faculty' => 'Arts'],
-    5 => ['name' => 'Student 5', 'id' => '25005', 'role' => 'Member',  'faculty' => 'Medicine'],
-];
->>>>>>> ccdf9faf2254a727418b8778e1d185be3630c631
+    // ---------------------------
 
     // Check if user exists
     if ($result->num_rows > 0) {
         $member = $result->fetch_assoc();
-        
-        // Handle case where role might be empty (default to Member)
-        if (empty($member['role'])) {
+                if (empty($member['role'])) {
             $member['role'] = 'Member';
         }
     } else {
