@@ -331,6 +331,17 @@ body.user-body {
     font-weight: 700; /* Bold text for active tab */
 }
 
+/* Add this to your style.css or inside <style> tags in the head */
+.nav-item.active {
+    color: #ffffff !important; /* Pure white */
+    opacity: 1;
+}
+.nav-item {
+    color: #ffffff;
+    opacity: 0.6; /* Dimmed by default */
+    transition: opacity 0.3s;
+}
+
 /* =========================================
    STYLE KHUSUS MEMBER DETAIL
    ========================================= */

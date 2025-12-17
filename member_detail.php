@@ -125,7 +125,7 @@ $att_result = $att_stmt->get_result();
                         } elseif ($row['status'] == 'Absent') {
                             $status_class = 'status-absent'; // You might need to add this to CSS
                         } else {
-                            $status_class = 'status-upcoming'; // For 'Scheduled' or 'Pending'
+                            $status_class = 'status-pending'; // For 'Scheduled' or 'Pending'
                         }
                     ?>
                     <div class="status-btn <?php echo $status_class; ?>">

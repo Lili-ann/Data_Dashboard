@@ -1,20 +1,20 @@
 <?php
 session_start();
+require_once 'config.php';
+
+// 1. Security Check
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
-$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] == 'admin');
+// Check if user is Manager or Admin (Adjust 'Manager' if your DB uses lowercase)
+$isAdmin = (isset($_SESSION['role']) && ($_SESSION['role'] == 'Manager' || $_SESSION['role'] == 'Admin'));
 
-// MOCK DATA MEETING
-// We use the index (0, 1, 2, 3) as the ID to pass to the next page
-$meetings = [
-    ['title' => 'Meeting 1', 'time' => '12 Oct, 10:00 AM', 'room' => 'Room 5'],
-    ['title' => 'Meeting 2', 'time' => '19 Oct, 02:00 PM', 'room' => 'Room 3'],
-    ['title' => 'Meeting 3', 'time' => '26 Oct, 09:00 AM', 'room' => 'Room 1'],
-    ['title' => 'Meeting 4', 'time' => '02 Nov, 04:00 PM', 'room' => 'Room 6'],
-];
+// 2. FETCH REAL MEETINGS FROM DB
+// We order by ID DESC so the newest meetings show first
+$sql = "SELECT * FROM schedule ORDER BY meeting_time DESC";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -33,56 +33,46 @@ $meetings = [
     
     <div class="user-container">
         
-        <div class="header">
-            <a href="user_page.php" class="header-btn">Back</a>
-            Meeting List
+        <div class="header" style="position: relative; display: flex; justify-content: flex-end; align-items: center;">
+            
+            <span style="position: absolute; left: 50%; transform: translateX(-50%); font-weight: bold; font-size: 1.2rem; color: #ffffff;">
+                Meeting List
+            </span>
+            
             <a href="logout.php" class="header-btn logout">Logout</a>
+
         </div>
 
-        <form action="save_meetings.php" method="POST">
-            <div class="content">
+        <div class="content">
+            
+            <?php if ($result->num_rows > 0): ?>
+                <?php while($row = $result->fetch_assoc()): ?>
                 
-                <?php foreach($meetings as $index => $meet): ?>
                 <div class="card">
                     
-                    <a href="attendance_list.php?id=<?php echo $index; ?>" style="text-decoration: none; flex: 1; display: flex;">
+                    <a href="attendance_list.php?id=<?php echo $row['id']; ?>" style="text-decoration: none; flex: 1; display: flex; color: inherit;">
                         <div class="card-left">
-                            <input type="hidden" name="meetings[<?php echo $index; ?>][title]" value="<?php echo $meet['title']; ?>">
-                            <span class="meeting-title"><?php echo $meet['title']; ?></span>
-                            <span class="meeting-time"><?php echo $meet['time']; ?></span>
+                            <span class="meeting-title"><?php echo htmlspecialchars($row['meeting_name']); ?></span>
+                            <span class="meeting-time">
+                                <?php echo date('d M, h:i A', strtotime($row['meeting_time'])); ?>
+                            </span>
                         </div>
                     </a>
 
                     <div class="card-right">
-                        <?php if ($isAdmin): ?>
-                            <select name="meetings[<?php echo $index; ?>][room]" class="dropdowncard">
-                                <?php 
-                                $rooms = ['Room 1', 'Room 2', 'Room 3', 'Room 4', 'Room 5', 'Room 6'];
-                                foreach($rooms as $r): 
-                                ?>
-                                    <option value="<?php echo $r; ?>" <?php echo ($meet['room'] == $r) ? 'selected' : ''; ?>>
-                                        <?php echo $r; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <i class="fas fa-chevron-down select-icon"></i>
-                        <?php else: ?>
-                            <span class="room-text">
-                                <?php echo $meet['room']; ?>
-                            </span>
-                        <?php endif; ?>
+                        <span class="room-text">
+                            <i class="fa-solid fa-location-dot" style="margin-right:5px; color:#800000;"></i>
+                            <?php echo htmlspecialchars($row['room']); ?>
+                        </span>
                     </div>
-                </div>
-                <?php endforeach; ?>
-            </div> 
 
-            <?php if ($isAdmin): ?>
-                <div class="save-button-container">
-                    <button type="submit" class="save-btn">Save Changes</button>
                 </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p style="text-align: center; color: #666; margin-top: 20px;">No meetings found in database.</p>
             <?php endif; ?>
 
-        </form>
+        </div> 
 
         <div class="bottom-nav">
              <a href="user_page.php" class="nav-item">
