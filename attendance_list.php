@@ -43,8 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_attendance'])) {
     $message = "Attendance saved successfully!";
 }
 
-// 4. FETCH MEETING DETAILS (Top Card)
-$meet_sql = "SELECT * FROM schedule WHERE id = ?";
+// 4. FETCH MEETING DETAILS (UPDATED: Join Venue Table)
+// We now get 'room_name' from the 'venue' table instead of 'room' from 'schedule'
+$meet_sql = "SELECT schedule.*, venue.room_name 
+             FROM schedule 
+             LEFT JOIN venue ON schedule.id = venue.schedule_id 
+             WHERE schedule.id = ?";
 $m_stmt = $conn->prepare($meet_sql);
 $m_stmt->bind_param("i", $schedule_id);
 $m_stmt->execute();
@@ -113,12 +117,13 @@ $status_options = ['Present', 'Absent', 'Pending'];
                 </div>
                 <div class="card-right">
                     <span class="room-text" style="font-size: 18px;">
-                        <?php echo htmlspecialchars($meeting['room']); ?>
+                        <?php echo !empty($meeting['room_name']) ? htmlspecialchars($meeting['room_name']) : 'TBA'; ?>
                     </span>
                 </div>
             </div>
 
-            <form method="POST"> <?php while($person = $attendees_result->fetch_assoc()): ?>
+            <form method="POST"> 
+                <?php while($person = $attendees_result->fetch_assoc()): ?>
                 <div class="dropdowncard">
                     
                     <div class="dropdowncard-left">

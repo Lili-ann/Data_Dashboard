@@ -7,7 +7,7 @@ if (isset($_POST['register'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];  
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); 
-    $role = $_POST['role'];
+    // $role = $_POST['role'];
     $major = $_POST['major'];
 
     // 1. RANDOM AVATAR LOGIC (Updated for 6 avatars)
@@ -48,12 +48,12 @@ if (isset($_POST['register'])) {
             $new_user_id = $user_stmt->insert_id;
 
             // 3. INSERT ROLE (Use a distinct variable: $role_stmt)
-            $role_stmt = $conn->prepare("INSERT INTO role (user_id, role) VALUES (?, ?)");
-            $role_stmt->bind_param("is", $new_user_id, $role);
-            $role_stmt->execute();
+            // $role_stmt = $conn->prepare("INSERT INTO role (user_id, role) VALUES (?, ?)");
+            // $role_stmt->bind_param("is", $new_user_id, $role);
+            // $role_stmt->execute();
             
-            // Close the role tool
-            $role_stmt->close();
+            // // Close the role tool
+            // $role_stmt->close();
         }
         // Close the user tool
         $user_stmt->close();
@@ -97,7 +97,7 @@ if (isset($_POST['login'])) {
             $_SESSION['role'] = $user_role; 
 
              if (strtolower($user_role) == 'admin') {
-                header("Location: admin_page.php");
+                header("Location: manage_roles.php");
             
             } elseif (strtolower($user_role) == 'manager') {
                 header("Location: meeting_list.php");

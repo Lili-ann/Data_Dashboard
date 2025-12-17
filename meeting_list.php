@@ -8,12 +8,15 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-// Check if user is Manager or Admin (Adjust 'Manager' if your DB uses lowercase)
-$isAdmin = (isset($_SESSION['role']) && ($_SESSION['role'] == 'Manager' || $_SESSION['role'] == 'Admin'));
+// Check if user is Manager or Admin (Useful if you add edit buttons later)
+$isAdmin = (isset($_SESSION['role']) && (strtolower($_SESSION['role']) == 'manager' || strtolower($_SESSION['role']) == 'admin'));
 
-// 2. FETCH REAL MEETINGS FROM DB
-// We order by ID DESC so the newest meetings show first
-$sql = "SELECT * FROM schedule ORDER BY meeting_time DESC";
+// 2. FETCH REAL MEETINGS + VENUES (Using JOIN)
+// We join 'venue' onto 'schedule' using the schedule ID.
+$sql = "SELECT schedule.*, venue.room_name 
+        FROM schedule 
+        LEFT JOIN venue ON schedule.id = venue.schedule_id 
+        ORDER BY schedule.meeting_time DESC";
 $result = $conn->query($sql);
 ?>
 
@@ -62,7 +65,9 @@ $result = $conn->query($sql);
                     <div class="card-right">
                         <span class="room-text">
                             <i class="fa-solid fa-location-dot" style="margin-right:5px; color:#800000;"></i>
-                            <?php echo htmlspecialchars($row['room']); ?>
+                            <?php 
+                                echo !empty($row['room_name']) ? htmlspecialchars($row['room_name']) : 'TBA'; 
+                            ?>
                         </span>
                     </div>
 

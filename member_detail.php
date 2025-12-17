@@ -11,22 +11,21 @@ if (!isset($_SESSION['email'])) {
 if (isset($_GET['id'])) {
     $id_requested = $_GET['id'];
 
-    // --- PASTE THIS BLOCK IN ---
+    // Fetch User Details
     $sql = "SELECT user.name, user.id, user.major, user.profile_pic, role.role 
         FROM user 
         LEFT JOIN role ON user.id = role.user_id 
         WHERE user.id = ?";
             
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id_requested); // "i" means integer
+    $stmt->bind_param("i", $id_requested);
     $stmt->execute();
     $result = $stmt->get_result();
-    // ---------------------------
 
     // Check if user exists
     if ($result->num_rows > 0) {
         $member = $result->fetch_assoc();
-                if (empty($member['role'])) {
+        if (empty($member['role'])) {
             $member['role'] = 'Member';
         }
     } else {
@@ -39,16 +38,16 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-
-// 3. FETCH REAL ATTENDANCE (Updated Logic!)
-// We JOIN 'attendance' with 'schedule' to get the meeting name, time, and room.
+// 3. FETCH REAL ATTENDANCE (Updated for Venue Table!)
+// We JOIN 'venue' to get the room name correctly.
 $att_sql = "SELECT 
                 attendance.status, 
                 schedule.meeting_name, 
                 schedule.meeting_time, 
-                schedule.room
+                venue.room_name 
             FROM attendance
             JOIN schedule ON attendance.schedule_id = schedule.id
+            LEFT JOIN venue ON schedule.id = venue.schedule_id
             WHERE attendance.user_id = ?
             ORDER BY schedule.meeting_time DESC";
 
@@ -104,17 +103,18 @@ $att_result = $att_stmt->get_result();
             <div class="section-title">Attendance</div>
 
             <?php 
-            // Check if they have any attendance records
             if ($att_result->num_rows > 0): 
                 while($row = $att_result->fetch_assoc()): 
-                    // Format the date: "Monday 12 Oct, 9:00pm"
+                    // Format the date
                     $formatted_date = date('l d M, g:ia', strtotime($row['meeting_time']));
+                    // Safe room display
+                    $room_display = !empty($row['room_name']) ? $row['room_name'] : 'TBA';
             ?>
             <div class="card">
                 <div class="card-left">
                     <span class="meeting-title"><?php echo htmlspecialchars($row['meeting_name']); ?></span>
                     <span class="meeting-time">Date: <?php echo $formatted_date; ?></span>
-                    <span class="meeting-time">Room: <?php echo htmlspecialchars($row['room']); ?></span>
+                    <span class="meeting-time">Room: <?php echo htmlspecialchars($room_display); ?></span>
                 </div>
                 
                 <div class="card-right">
@@ -123,9 +123,9 @@ $att_result = $att_stmt->get_result();
                         if ($row['status'] == 'Present') {
                             $status_class = 'status-present';
                         } elseif ($row['status'] == 'Absent') {
-                            $status_class = 'status-absent'; // You might need to add this to CSS
+                            $status_class = 'status-absent'; 
                         } else {
-                            $status_class = 'status-pending'; // For 'Scheduled' or 'Pending'
+                            $status_class = 'status-pending'; 
                         }
                     ?>
                     <div class="status-btn <?php echo $status_class; ?>">
