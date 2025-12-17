@@ -96,6 +96,8 @@ if (isset($_POST['login'])) {
             $_SESSION['email'] = $user['email']; 
             $_SESSION['role'] = $user_role; 
 
+            logActivity($conn, $user['id'], $user['name'], 'Login', 'User logged into the system.');
+
              if (strtolower($user_role) == 'admin') {
                 header("Location: manage_roles.php");
             

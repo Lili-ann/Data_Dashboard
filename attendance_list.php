@@ -41,7 +41,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_attendance'])) {
         }
     }
     $message = "Attendance saved successfully!";
+
+// ======================================================
+    // [NEW] LOG THIS ACTION TO DATABASE
+    // ======================================================
+    // We log: Who did it ($_SESSION['id']), What they did ('Update Attendance'), and details.
+    
+    // Check if name is set in session, otherwise default to 'Admin'
+    $logger_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Unknown Admin';
+    
+    $log_details = "Updated attendance for Meeting ID: " . $schedule_id;
+    
+    logActivity($conn, $_SESSION['id'], $logger_name, 'Update Attendance', $log_details);
+    // ======================================================
+
 }
+
+
+
 
 // 4. FETCH MEETING DETAILS (UPDATED: Join Venue Table)
 // We now get 'room_name' from the 'venue' table instead of 'room' from 'schedule'
