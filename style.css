@@ -168,6 +168,22 @@ body.user-body {
     z-index: 1;
 }
 
+/* Add to style.css */
+.role-badge.admin {
+    background: #ffffff; /* Red for admins */
+    color: #de0000;
+}
+
+.role-badge.member {
+    background: #f1d3db; /* Light pink for users */
+    color: #002fff;
+}
+
+.role-badge.manager {
+    background: #f1d3db; /* Light pink for users */
+    color: #ff5900;
+}
+
 /* Ganti nama .container jadi .user-container agar tidak bentrok */
 .user-container {
     position: relative;
@@ -342,12 +358,16 @@ body.user-body {
 }
 
 .status-present {
-    background-color: #600000; /* Merah Maroon */
+    background-color: #238c07; /* Merah Maroon */
 }
 
 .status-upcoming {
-    background-color: #600000; /* Merah Maroon (Sama kayak gambar) */
+    background-color: #2d7fe4; /* Merah Maroon (Sama kayak gambar) */
 }
+.status-absent {
+    background-color: #eb0101; /* Merah Maroon (Sama kayak gambar) */
+}
+
 .section-title {
     font-family: 'Poppins', sans-serif;
     color: #600000; /* Deep Red to match theme */
@@ -356,3 +376,6 @@ body.user-body {
     margin: 20px 0 10px 0;
     text-align: center;
 }
+
+/* Add this to your style.css */
+

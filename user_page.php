@@ -1,19 +1,17 @@
 <?php
 session_start();
+require_once 'config.php';
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
-// MOCK DATA 
-$members = [
-    ['name' => 'Student 1', 'id' => 'ID', 'role' => 'Admin'],
-    ['name' => 'Student 2', 'id' => 'ID', 'role' => 'Manager'],
-    ['name' => 'Student 3', 'id' => 'ID', 'role' => 'Manager'],
-    ['name' => 'Student 3', 'id' => 'ID', 'role' => 'Member'],
-    ['name' => 'Student 4', 'id' => 'ID', 'role' => 'Member'], // Saya tambah satu biar kelihatan scrollnya
-]; 
+$sql = "SELECT user.id, user.name, role.role 
+        FROM user 
+        JOIN role ON user.id = role.user_id";
+$result = $conn->query($sql);
 ?>
+
 
 
 <!DOCTYPE html>
@@ -41,32 +39,42 @@ $members = [
 
         <div class="content">
             <?php 
-            // Kita kasih index angka manual agar bisa ditangkap di halaman detail
-            // key 'id_data' ini ceritanya ID dari database
-            $index = 1; 
-            foreach($members as $member): 
-                $member_id = $index++; // Simulasi ID 1, 2, 3, dst
+           // 2. CHECK IF USERS EXIST
+            if ($result->num_rows > 0) {
+                // 3. LOOP THROUGH EACH USER
+                while($row = $result->fetch_assoc()) { 
+                    $displayRole = !empty($row['role']) ? $row['role'] : 'Member';
             ?>
             
-            <a href="member_detail.php?id=<?php echo $member_id; ?>" style="text-decoration:none; color:inherit;">
+            <a href="member_detail.php?id=<?php echo $row['id']; ?>" style="text-decoration:none; color:inherit;">
                 <div class="card">
                     <div class="card-left">
-                        <span class="student-name"><?php echo $member['name']; ?></span>
-                        <span class="student-id"><?php echo $member['id']; ?></span>
+                        <span class="student-name"><?php echo $row['name']; ?></span>
+                        <span class="student-id"><?php echo $row['id']; ?></span>
                     </div>
+
                     <div class="card-right">
-                        <?php echo $member['role']; ?>
+                       <span class="role-badge <?php echo strtolower($displayRole); ?>">
+                            <?php echo htmlspecialchars($displayRole); ?>
+                        </span>
                     </div>
                 </div>
             </a>
             
-            <?php endforeach; ?>
+          <?php 
+                } 
+            } else {
+                echo "<p style='text-align:center; margin-top:20px;'>No members found.</p>";
+            }
+            ?>
         </div>
 
         <div class="bottom-nav">
+            <a href="#" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+             <a href="#" class="nav-item"><i class="fas fa-search"></i><span>Search</span></a>
+             <a href="logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
         </div>
 
     </div>
-
 </body>
 </html>

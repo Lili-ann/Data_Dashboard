@@ -1,33 +1,63 @@
 <?php
 session_start();
+require_once 'config.php';
+
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
-// 1. Tangkap ID dari URL (yang dikirim dari user_page.php)
-$id_requested = isset($_GET['id']) ? $_GET['id'] : 1; // Default ke 1 kalo error
+/// 1. Get ID from URL
+if (isset($_GET['id'])) {
+    $id_requested = $_GET['id'];
 
-// 2. MOCK DATA MEMBER (Harus sama urutannya dengan user_page biar datanya nyambung)
-// Array key (1, 2, 3) disini berperan sebagai ID Database
-$members_db = [
-    1 => ['name' => 'Student 1', 'id' => '25001', 'role' => 'Admin',   'faculty' => 'Computer Science'],
-    2 => ['name' => 'Student 2', 'id' => '25002', 'role' => 'Manager', 'faculty' => 'Business'],
-    3 => ['name' => 'Student 3', 'id' => '25003', 'role' => 'Manager', 'faculty' => 'Engineering'],
-    4 => ['name' => 'Student 3', 'id' => '25004', 'role' => 'Member',  'faculty' => 'Arts'],
-    5 => ['name' => 'Student 4', 'id' => '25005', 'role' => 'Member',  'faculty' => 'Medicine'],
-];
+    $sql = "SELECT user.name, user.id, user.major, user.profile_pic, role.role 
+        FROM user 
+        LEFT JOIN role ON user.id = role.user_id 
+        WHERE user.id = ?";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_requested); // "i" means integer
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-// Ambil data sesuai ID
-$current_member = isset($members_db[$id_requested]) ? $members_db[$id_requested] : $members_db[1];
+    // Check if user exists
+    if ($result->num_rows > 0) {
+        $member = $result->fetch_assoc();
+        
+        // Handle case where role might be empty (default to Member)
+        if (empty($member['role'])) {
+            $member['role'] = 'Member';
+        }
+    } else {
+        echo "User not found.";
+        exit();
+    }
+} else {
+    // If no ID provided in URL, go back to list
+    header("Location: user_page.php");
+    exit();
+}
 
-// 3. MOCK DATA ATTENDANCE (List Absensi)
-$attendance_list = [
-    ['meeting' => 'Meeting 1', 'date' => '12 Oct 2025', 'room' => 'Room 5', 'status' => 'Present'],
-    ['meeting' => 'Meeting 2', 'date' => '19 Oct 2025', 'room' => 'Room 3', 'status' => 'Upcoming'],
-];
 
+// 3. FETCH REAL ATTENDANCE (Updated Logic!)
+// We JOIN 'attendance' with 'schedule' to get the meeting name, time, and room.
+$att_sql = "SELECT 
+                attendance.status, 
+                schedule.meeting_name, 
+                schedule.meeting_time, 
+                schedule.room
+            FROM attendance
+            JOIN schedule ON attendance.schedule_id = schedule.id
+            WHERE attendance.user_id = ?
+            ORDER BY schedule.meeting_time DESC";
+
+$att_stmt = $conn->prepare($att_sql);
+$att_stmt->bind_param("i", $id_requested);
+$att_stmt->execute();
+$att_result = $att_stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,34 +83,61 @@ $attendance_list = [
             
             <div class="profile-section">
                 <div class="profile-pic-box">
-                    <i class="fas fa-user-tie"></i>
+                    <?php 
+                        // If DB has a pic, use it. If empty, fallback to avatar1.
+                        $pic_name = !empty($member['profile_pic']) ? $member['profile_pic'] : 'avatar1.jpg';
+                        $img_src = 'uploads/' . $pic_name; 
+                    ?>
+                    <img src="<?php echo htmlspecialchars($img_src); ?>" 
+                        alt="Profile Picture" 
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
                 </div>
 
                 <div class="profile-info">
-                    <p><strong>Name :</strong> <?php echo $current_member['name']; ?></p>
-                    <p><strong>ID :</strong> <?php echo $current_member['id']; ?></p>
-                    <p><strong>Role :</strong> <?php echo $current_member['role']; ?></p>
-                    <p><strong>Faculty :</strong> <?php echo $current_member['faculty']; ?></p>
+                    <p><strong>Name :</strong> <?php echo htmlspecialchars(ucwords($member['name'])); ?></p>
+                    <p><strong>ID :</strong> <?php echo htmlspecialchars($member['id']); ?></p>
+                    <p><strong>Role :</strong> <?php echo htmlspecialchars(ucfirst($member['role'])); ?></p>
+                    <p><strong>Major :</strong> <?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $member['major']))); ?></p>
                 </div>
             </div>
 
             <div class="section-title">Attendance</div>
 
-            <?php foreach($attendance_list as $att): ?>
+            <?php 
+            // Check if they have any attendance records
+            if ($att_result->num_rows > 0): 
+                while($row = $att_result->fetch_assoc()): 
+                    // Format the date: "Monday 12 Oct, 9:00pm"
+                    $formatted_date = date('l d M, g:ia', strtotime($row['meeting_time']));
+            ?>
             <div class="card">
                 <div class="card-left">
-                    <span class="meeting-title"><?php echo $att['meeting']; ?></span>
-                    <span class="meeting-time">Date: <?php echo $att['date']; ?></span>
-                    <span class="meeting-time">Room: <?php echo $att['room']; ?></span>
+                    <span class="meeting-title"><?php echo htmlspecialchars($row['meeting_name']); ?></span>
+                    <span class="meeting-time">Date: <?php echo $formatted_date; ?></span>
+                    <span class="meeting-time">Room: <?php echo htmlspecialchars($row['room']); ?></span>
                 </div>
                 
                 <div class="card-right">
-                    <div class="status-btn <?php echo ($att['status'] == 'Present') ? 'status-present' : 'status-upcoming'; ?>">
-                        <?php echo $att['status']; ?>
+                  <?php 
+                        $status_class = '';
+                        if ($row['status'] == 'Present') {
+                            $status_class = 'status-present';
+                        } elseif ($row['status'] == 'Absent') {
+                            $status_class = 'status-absent'; // You might need to add this to CSS
+                        } else {
+                            $status_class = 'status-upcoming'; // For 'Scheduled' or 'Pending'
+                        }
+                    ?>
+                    <div class="status-btn <?php echo $status_class; ?>">
+                        <?php echo htmlspecialchars($row['status']); ?>
                     </div>
                 </div>
             </div>
-            <?php endforeach; ?>
+            <?php endwhile; ?>
+            
+            <?php else: ?>
+                <p style="text-align: center; color: #777; margin-top: 20px;">No attendance history found.</p>
+            <?php endif; ?>
 
         </div> 
 

@@ -10,6 +10,21 @@ if (isset($_POST['register'])) {
     $role = $_POST['role'];
     $major = $_POST['major'];
 
+    // 1. RANDOM AVATAR LOGIC (Updated for 6 avatars)
+    $avatar_list = [
+        'avatar1.jpg', 
+        'avatar2.jpg', 
+        'avatar3.jpg', 
+        'avatar4.jpg', 
+        'avatar5.jpg', 
+        'avatar6.jpg'
+    ];
+    
+    // Pick one random key
+    $random_key = array_rand($avatar_list);
+    // Get the filename (e.g., 'avatar6.png')
+    $profile_pic = $avatar_list[$random_key];
+
     // 1. CHECK EMAIL (Use a distinct variable: $check_stmt)
     $check_stmt = $conn->prepare("SELECT email FROM user WHERE email = ?");
     $check_stmt->bind_param("s", $email);
@@ -23,9 +38,10 @@ if (isset($_POST['register'])) {
     } else {
         $check_stmt->close(); // Close the check tool before moving on
 
-        // 2. INSERT USER (Use a distinct variable: $user_stmt)
-        $user_stmt = $conn->prepare("INSERT INTO user (name, email, password, major) VALUES (?, ?, ?, ?)");
-        $user_stmt->bind_param("ssss", $name, $email, $password, $major);
+       // 3. INSERT USER (With profile_pic)
+        $user_stmt = $conn->prepare("INSERT INTO user (name, email, password, major, profile_pic) VALUES (?, ?, ?, ?, ?)");
+        // Note: "sssss" = 5 strings (name, email, password, major, pic)
+        $user_stmt->bind_param("sssss", $name, $email, $password, $major, $profile_pic);
 
         if ($user_stmt->execute()) {
             // Get the new ID
@@ -70,7 +86,7 @@ if (isset($_POST['login'])) {
                 $row = $result_role->fetch_assoc();
                 $user_role = $row['role'];
             } else {
-                $role = 'member';
+                $user_role = 'member';
             }
             $stmt_role->close();
 
@@ -80,11 +96,17 @@ if (isset($_POST['login'])) {
             $_SESSION['role'] = $user_role; // Important: Save role to session for security checks
 
             // 5. Redirect based on role
-            if ($user_role == 'admin') {
+             if (strtolower($user_role) == 'admin') {
                 header("Location: admin_page.php");
+            
+            } elseif (strtolower($user_role) == 'manager') {
+                header("Location: manager_page.php");
+            
             } else {
+                // Default for 'member', 'officer', or 'user'
                 header("Location: user_page.php");
             }
+            
             exit();
         } 
     }
