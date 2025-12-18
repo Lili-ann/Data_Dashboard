@@ -7,22 +7,24 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-/// 1. Get ID from URL
 if (isset($_GET['id'])) {
     $id_requested = $_GET['id'];
 
-    // Fetch User Details
+    //for fetching user details and its role from database user and role tables
+    //"LEFT JOIN" the `role` table so we still get the user even if no row in the role table exists for that user.
     $sql = "SELECT user.name, user.id, user.major, user.profile_pic, role.role 
         FROM user 
         LEFT JOIN role ON user.id = role.user_id 
         WHERE user.id = ?";
-            
+
     $stmt = $conn->prepare($sql);
+    //this binds the requested ID as an integer parameter to avoid SQL injection
     $stmt->bind_param("i", $id_requested);
+    //execute and get the result set of the query 
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Check if user exists
+    //this check if user exists in the database 
     if ($result->num_rows > 0) {
         $member = $result->fetch_assoc();
         if (empty($member['role'])) {
@@ -33,13 +35,15 @@ if (isset($_GET['id'])) {
         exit();
     }
 } else {
-    // If no ID provided in URL, go back to list
+    //if nthere's no ID provided in URL, go back to user_page.php 
     header("Location: user_page.php");
     exit();
 }
 
-// 3. FETCH REAL ATTENDANCE (Updated for Venue Table!)
-// We JOIN 'venue' to get the room name correctly.
+//getting attendance records for this user from attendance and schedule tables
+//this query selects attendance records for the user, joining `schedule` to get meeting details 
+//and LEFT JOINing `venue` to retrieve the room name, if there's any.
+// then order by meeting time in descending order (most recent first)
 $att_sql = "SELECT 
                 attendance.status, 
                 schedule.meeting_name, 
@@ -52,7 +56,9 @@ $att_sql = "SELECT
             ORDER BY schedule.meeting_time DESC";
 
 $att_stmt = $conn->prepare($att_sql);
+//this binds the user id to the prepared statement as integer parameter to avoid SQL injection
 $att_stmt->bind_param("i", $id_requested);
+//execute and fetch attendance result set
 $att_stmt->execute();
 $att_result = $att_stmt->get_result();
 ?>
@@ -83,7 +89,7 @@ $att_result = $att_stmt->get_result();
             <div class="profile-section">
                 <div class="profile-pic-box">
                     <?php 
-                        // If DB has a pic, use it. If empty, fallback to avatar1.
+                        //this checks if the database has another image. If empty, fallback to avatar1.
                         $pic_name = !empty($member['profile_pic']) ? $member['profile_pic'] : 'avatar1.jpg';
                         $img_src = 'uploads/' . $pic_name; 
                     ?>
@@ -103,11 +109,12 @@ $att_result = $att_stmt->get_result();
             <div class="section-title">Attendance</div>
 
             <?php 
+            //checking if attendance records exist, loops through them and display
             if ($att_result->num_rows > 0): 
                 while($row = $att_result->fetch_assoc()): 
-                    // Format the date
+                    //format the meeting date for better readability which is like "Monday 01 Jan, 3:30pm"
                     $formatted_date = date('l d M, g:ia', strtotime($row['meeting_time']));
-                    // Safe room display
+                    //room displa name check for cases where room_name is NULL or empty
                     $room_display = !empty($row['room_name']) ? $row['room_name'] : 'TBA';
             ?>
             <div class="card">
