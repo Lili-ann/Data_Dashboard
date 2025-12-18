@@ -7,11 +7,12 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-// Check if user is Manager or Admin (Useful if you add edit buttons later)
-$isAdmin = (isset($_SESSION['role']) && (strtolower($_SESSION['role']) == 'manager' || strtolower($_SESSION['role']) == 'admin'));
+// --- FIXED ROLE LOGIC ---
+$role = isset($_SESSION['role']) ? strtolower($_SESSION['role']) : '';
+$isAdmin = ($role == 'admin'); 
+$isManager = ($role == 'manager');
 
 // 2. FETCH REAL MEETINGS + VENUES (Using JOIN)
-// We join 'venue' onto 'schedule' using the schedule ID.
 $sql = "SELECT schedule.*, venue.room_name 
         FROM schedule 
         LEFT JOIN venue ON schedule.id = venue.schedule_id 
@@ -83,7 +84,7 @@ $result = $conn->query($sql);
         </div> 
 
         <div class="bottom-nav">
-             <?php if ($isAdmin): // --- ADMIN NAV WITH ICONS --- ?>
+             <?php if ($isAdmin): // --- ADMIN NAV (3 Items) --- ?>
                 
                 <a href="user_page.php" class="nav-item">
                     <i class="fas fa-users-cog"></i>
@@ -100,11 +101,13 @@ $result = $conn->query($sql);
                     <span class="nav-text">View<br>Logs</span>
                 </a>
 
-            <?php else: // --- USER/MANAGER NAV --- ?>
+            <?php else: // --- MANAGER / MEMBER NAV (2 Items) --- ?>
+                
                 <a href="meeting_list.php" class="nav-item active">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Meeting<br>List</span>
                 </a>
+                
                 <a href="user_page.php" class="nav-item">
                     <i class="fa-solid fa-user"></i>
                     <span class="nav-text">Member<br>List</span>

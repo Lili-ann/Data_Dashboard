@@ -10,15 +10,28 @@ if (!isset($_SESSION['email'])) {
 
 // 2. GET MEETING ID
 if (!isset($_GET['id'])) {
-    echo "No meeting ID provided.";
+    header("Location: meeting_list.php");
     exit();
 }
 $schedule_id = $_GET['id'];
 
+// --- FIXED ROLE LOGIC ---
+$role = isset($_SESSION['role']) ? strtolower($_SESSION['role']) : '';
+$isAdmin = ($role == 'admin'); 
+
+// 3. HANDLE FORM SUBMISSION (Save/Update Attendance)
 // 3. HANDLE FORM SUBMISSION (Save/Update Attendance)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_attendance'])) {
     
     foreach ($_POST['status'] as $user_id => $status_value) {
+        
+        // --- [FIX] SKIP EMPTY SELECTIONS ---
+        // If the admin left it as "-- Select --", ignore this user.
+        if (empty($status_value)) {
+            continue; 
+        }
+        // -----------------------------------
+
         // Check if a record already exists for this user + meeting
         $check_sql = "SELECT id FROM attendance WHERE user_id = ? AND schedule_id = ?";
         $check_stmt = $conn->prepare($check_sql);
@@ -40,28 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_attendance'])) {
             $insert_stmt->execute();
         }
     }
+    
     $message = "Attendance saved successfully!";
 
-// ======================================================
-    // [NEW] LOG THIS ACTION TO DATABASE
-    // ======================================================
-    // We log: Who did it ($_SESSION['id']), What they did ('Update Attendance'), and details.
-    
-    // Check if name is set in session, otherwise default to 'Admin'
-    $logger_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Unknown Admin';
-    
+    // LOG THIS ACTION
+    $logger_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Unknown User';
     $log_details = "Updated attendance for Meeting ID: " . $schedule_id;
-    
-    logActivity($conn, $_SESSION['id'], $logger_name, 'Update Attendance', $log_details);
-    // ======================================================
-
+    if (function_exists('logActivity')) {
+        logActivity($conn, $_SESSION['id'], $logger_name, 'Update Attendance', $log_details);
+    }
 }
 
-
-
-
-// 4. FETCH MEETING DETAILS (UPDATED: Join Venue Table)
-// We now get 'room_name' from the 'venue' table instead of 'room' from 'schedule'
+// 4. FETCH MEETING DETAILS
 $meet_sql = "SELECT schedule.*, venue.room_name 
              FROM schedule 
              LEFT JOIN venue ON schedule.id = venue.schedule_id 
@@ -77,7 +80,6 @@ if (!$meeting) {
 }
 
 // 5. FETCH ALL USERS + CURRENT ATTENDANCE
-// We use LEFT JOIN so we get ALL users, even if they haven't been marked yet.
 $sql = "SELECT user.id, user.name, role.role, attendance.status 
         FROM user 
         LEFT JOIN role ON user.id = role.user_id 
@@ -89,7 +91,6 @@ $stmt->bind_param("i", $schedule_id);
 $stmt->execute();
 $attendees_result = $stmt->get_result();
 
-// Status Options
 $status_options = ['Present', 'Absent', 'Pending'];
 ?>
 
@@ -175,15 +176,36 @@ $status_options = ['Present', 'Absent', 'Pending'];
         </div> 
         
         <div class="bottom-nav">
-            <a href="user_page.php" class="nav-item">
-                <i class="fa-solid fa-user"></i>
-                <span class="nav-text">Member<br>List</span>
-            </a>
-            
-            <a href="meeting_list.php" class="nav-item active">
-                <i class="fas fa-calendar-check"></i>
-                <span class="nav-text">Meeting<br>List</span>
-            </a>
+             <?php if ($isAdmin): // --- ADMIN NAV (3 Items) --- ?>
+                
+                <a href="user_page.php" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span class="nav-text">Manage<br>members</span>
+                </a>
+
+                <a href="meeting_list.php" class="nav-item active">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="nav-text">Manage<br>schedule</span>
+                </a>
+
+                <a href="admin_logs.php" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="nav-text">View<br>Logs</span>
+                </a>
+
+            <?php else: // --- MANAGER / MEMBER NAV (2 Items) --- ?>
+                
+                <a href="meeting_list.php" class="nav-item active">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="nav-text">Meeting<br>List</span>
+                </a>
+                
+                <a href="user_page.php" class="nav-item">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="nav-text">Member<br>List</span>
+                </a>
+
+            <?php endif; ?>
         </div>
 
     </div>

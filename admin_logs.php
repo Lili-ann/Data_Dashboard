@@ -8,8 +8,12 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-// 2. FETCH REAL LOGS FROM DATABASE
-$sql = "SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 50";
+// 2. FETCH LOGS + JOIN USER TABLE
+// We join the 'user' table so we can see the CURRENT name, not the old one.
+$sql = "SELECT activity_log.*, user.name AS current_name 
+        FROM activity_log 
+        LEFT JOIN user ON activity_log.user_id = user.id 
+        ORDER BY activity_log.created_at DESC LIMIT 50";
 $result = $conn->query($sql);
 ?>
 
@@ -43,13 +47,19 @@ $result = $conn->query($sql);
                 <?php if ($result->num_rows > 0): ?>
                     <?php while($row = $result->fetch_assoc()): ?>
                         
+                        <?php 
+                            // LOGIC: Use the current name from user table. 
+                            // If user was deleted (current_name is null), fallback to the name stored in the log.
+                            $display_name = !empty($row['current_name']) ? $row['current_name'] : $row['user_name'];
+                        ?>
+
                         <div class="log-line">
                             <span style="float: right; font-size: 11px; color: #666; margin-top: 2px;">
                                 <?php echo date('d M, H:i', strtotime($row['created_at'])); ?>
                             </span>
 
                             <span class="darkred-name">
-                                <?php echo htmlspecialchars($row['user_name']); ?>
+                                <?php echo htmlspecialchars($display_name); ?>
                             </span>
 
                             <span style="color: #222; font-weight: bold; font-size: 14px; margin-right: 5px;">
@@ -70,7 +80,7 @@ $result = $conn->query($sql);
         </div>
 
         <div class="bottom-nav">
-            <a href="admin_page.php" class="nav-item">
+            <a href="user_page.php" class="nav-item">
                 <i class="fas fa-users-cog"></i>
                 <span class="nav-text">Manage<br>members</span>
             </a>
