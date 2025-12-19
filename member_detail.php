@@ -1,12 +1,17 @@
+<!-- Starting the session and connecting to the database then verify the login by using email-->
+ 
+
 <?php
 session_start();
 require_once 'config.php';
-
+ 
+// 1. Security Check
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
+//2. Fetch Member ID from URL and Get Member Details
 if (isset($_GET['id'])) {
     $id_requested = $_GET['id'];
 
@@ -17,6 +22,7 @@ if (isset($_GET['id'])) {
         LEFT JOIN role ON user.id = role.user_id 
         WHERE user.id = ?";
 
+    // prepare and bind to avoid SQL injection  
     $stmt = $conn->prepare($sql);
     //this binds the requested ID as an integer parameter to avoid SQL injection
     $stmt->bind_param("i", $id_requested);
@@ -45,25 +51,26 @@ if (isset($_GET['id'])) {
 //and LEFT JOINing `venue` to retrieve the room name, if there's any.
 // then order by meeting time in descending order (most recent first)
 $att_sql = "SELECT 
-                attendance.status, 
-                schedule.meeting_name, 
-                schedule.meeting_time, 
-                venue.room_name 
-            FROM attendance
-            JOIN schedule ON attendance.schedule_id = schedule.id
-            LEFT JOIN venue ON schedule.id = venue.schedule_id
-            WHERE attendance.user_id = ?
-            ORDER BY schedule.meeting_time DESC";
+                attendance.status, --attendance status (Present, Absent, Pending)
+                schedule.meeting_name, --meeting name
+                schedule.meeting_time, --meeting time
+                venue.room_name -- Roomm Number
+            FROM attendance -- attendance table
+            JOIN schedule ON attendance.schedule_id = schedule.id -- join schedule table
+            LEFT JOIN venue ON schedule.id = venue.schedule_id -- left join venue table to get room number
+            WHERE attendance.user_id = ? --filter by user id
+            ORDER BY schedule.meeting_time DESC"; //order by meeting time descending
 
 $att_stmt = $conn->prepare($att_sql);
 //this binds the user id to the prepared statement as integer parameter to avoid SQL injection
 $att_stmt->bind_param("i", $id_requested);
 //execute and fetch attendance result set
 $att_stmt->execute();
+//get the result set of attendance query
 $att_result = $att_stmt->get_result();
 ?>
 
-
+<!-- Member Detail Page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,11 +92,13 @@ $att_result = $att_stmt->get_result();
         </div>
 
         <div class="content">
-            
+
+            <!-- Profile Section -->
             <div class="profile-section">
                 <div class="profile-pic-box">
                     <?php 
                         //this checks if the database has another image. If empty, fallback to avatar1.
+                        // Displaying profile picture
                         $pic_name = !empty($member['profile_pic']) ? $member['profile_pic'] : 'avatar1.jpg';
                         $img_src = 'uploads/' . $pic_name; 
                     ?>
@@ -98,7 +107,7 @@ $att_result = $att_stmt->get_result();
                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
                 </div>
 
-                <div class="profile-info">
+                <div class="profile-info"> <!-- Displaying member information -->
                     <p><strong>Name :</strong> <?php echo htmlspecialchars(ucwords($member['name'])); ?></p>
                     <p><strong>ID :</strong> <?php echo htmlspecialchars($member['id']); ?></p>
                     <p><strong>Role :</strong> <?php echo htmlspecialchars(ucfirst($member['role'])); ?></p>
@@ -106,26 +115,26 @@ $att_result = $att_stmt->get_result();
                 </div>
             </div>
 
-            <div class="section-title">Attendance</div>
-
+            <div class="section-title">Attendance</div> 
+            <!-- Attendance Records Section -->
             <?php 
             //checking if attendance records exist, loops through them and display
-            if ($att_result->num_rows > 0): 
-                while($row = $att_result->fetch_assoc()): 
+            if ($att_result->num_rows > 0): // Shows Attendance Records
+                while($row = $att_result->fetch_assoc()):  
                     //format the meeting date for better readability which is like "Monday 01 Jan, 3:30pm"
                     $formatted_date = date('l d M, g:ia', strtotime($row['meeting_time']));
                     //room displa name check for cases where room_name is NULL or empty
                     $room_display = !empty($row['room_name']) ? $row['room_name'] : 'TBA';
             ?>
             <div class="card">
-                <div class="card-left">
+                <div class="card-left"> <!--Displaying meeting details-->
                     <span class="meeting-title"><?php echo htmlspecialchars($row['meeting_name']); ?></span>
                     <span class="meeting-time">Date: <?php echo $formatted_date; ?></span>
                     <span class="meeting-time">Room: <?php echo htmlspecialchars($room_display); ?></span>
                 </div>
                 
-                <div class="card-right">
-                  <?php 
+                <div class="card-right"> <!--Displaying attendance status-->
+                  <?php  
                         $status_class = '';
                         if ($row['status'] == 'Present') {
                             $status_class = 'status-present';
@@ -134,8 +143,8 @@ $att_result = $att_stmt->get_result();
                         } else {
                             $status_class = 'status-pending'; 
                         }
-                    ?>
-                    <div class="status-btn <?php echo $status_class; ?>">
+                    ?> 
+                    <div class="status-btn <?php echo $status_class; ?>"> <!--status badge-->
                         <?php echo htmlspecialchars($row['status']); ?>
                     </div>
                 </div>
@@ -149,6 +158,7 @@ $att_result = $att_stmt->get_result();
         </div> 
 
         <div class="bottom-nav">
+            <!-- Back to Members List -->
             <a href="user_page.php" class="nav-item">
                 <i class="fa-solid fa-backward"></i> 
                 <span>Back</span>
