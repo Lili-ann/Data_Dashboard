@@ -143,20 +143,20 @@ span{
    Custom style for all pages besides login
    ========================================= */
 
-/* Gunakan class khusus 'user-body' agar tidak bentrok dengan login */
+/* Custom Class 'user-body' so it not clash with the login page */
 body.user-body {
     background-color: #f0f0f0;
     /* Background Image */
     background-image: url('images/library-2.png'); 
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* Agar background tetap saat scroll */
+    background-attachment: fixed; /* Background keeps when scrolling */
     height: 100vh;
     position: relative;
-    display: block; /* Override flex dari login page */
+    display: block; /* Override flex from the login page */
 }
 
-/* Overlay transparan */
+/* Transparent Overlay */
 .overlay {
     position: absolute;
     top: 0;
@@ -181,7 +181,7 @@ body.user-body {
     color: #ff5900;
 }
 
-/* Ganti nama .container jadi .user-container agar tidak bentrok */
+/* Changed from .container to .user-container so it not clash */
 .user-container {
     position: relative;
     z-index: 2;
@@ -201,15 +201,15 @@ body.user-body {
     font-weight: 600;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     height: 70px;
-    display: flex; /* WAJIB ADA agar sejajar */
-    justify-content: space-between; /* Kiri - Tengah - Kanan */
-    align-items: center; /* Vertikal Center */
+    display: flex; /* Mandatory to make it equal */
+    justify-content: space-between; /* Left - Mid - Right */
+    align-items: center; /* Vertical Center */
     font-family: "Poppins", serif;
 }
 
 /* HEADER BACK AND LOGOUT */
 .header-btn {
-    color: white; /* Force warna putih */
+    color: white; 
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
@@ -219,7 +219,7 @@ body.user-body {
 }
 
 .header-btn.logout {
-    justify-content: flex-end; /* Rata kanan */
+    justify-content: flex-end; /* Right Aligned */
 }
 
 
@@ -343,12 +343,12 @@ body.user-body {
 }
 
 /* =========================================
-   STYLE KHUSUS MEMBER DETAIL
+   MEMBER DETAIL CUSTOM STYLE
    ========================================= */
 .profile-section {
     display: flex;
     align-items: center;
-    gap: 20px; /* Jarak antara foto dan teks */
+    gap: 20px; /* Space between photo and text */
     margin: 20px 0;
     padding: 0 10px;
 }
@@ -357,7 +357,7 @@ body.user-body {
     width: 100px;
     height: 100px;
     background-color: white;
-    border: 5px solid #870505; /* Hijau tua sesuai gambar */
+    border: 5px solid #870505; /* Old Green like the pic */
     border-radius: 15px;
     display: flex;
     justify-content: center;
@@ -370,7 +370,7 @@ body.user-body {
     color: black;
 }
 
-/* Teks Info (Name, ID, Role, Faculty) */
+/* Text Information (Name, ID, Role, Faculty) */
 .profile-info {
     font-size: 14px;
     color: #333;
@@ -380,7 +380,7 @@ body.user-body {
 .profile-info strong {
     font-weight: 600;
 }
-/* Tombol Status (Present/Upcoming) */
+/* Status Button (Present/Upcoming) */
 .status-btn {
     padding: 8px 15px;
     border-radius: 5px;
@@ -392,14 +392,14 @@ body.user-body {
 }
 
 .status-present {
-    background-color: #238c07; /* Merah Maroon */
+    background-color: #238c07; /* Maroon Red */
 }
 
 .status-pending {
-    background-color: #2d7fe4; /* Merah Maroon (Sama kayak gambar) */
+    background-color: #2d7fe4; /* Maroon Red (Exact like the picture) */
 }
 .status-absent {
-    background-color: #eb0101; /* Merah Maroon (Sama kayak gambar) */
+    background-color: #eb0101; /* Maroon Red (Sama kayak gambar) */
 }
 
 .section-title {
