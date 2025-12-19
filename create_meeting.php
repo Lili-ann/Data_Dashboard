@@ -85,7 +85,7 @@ if (isset($_POST['create_meeting'])) {
             <?php endif; ?>
 
             <form method="POST">
-                
+                 <!-- Making use of the style "dropdowncard" class -->
                 <div class="dropdowncard">
                     <div class="dropdowncard-left">
                         <span class="staff-name">Meeting</span>

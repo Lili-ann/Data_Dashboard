@@ -61,13 +61,6 @@ if (isset($_POST['update_member'])) {
     }
     $r_stmt->execute();
     $r_stmt->close();
-
-    // --- [FIX] LOG THE UPDATE ACTION ---
-    if (function_exists('logActivity')) {
-        // We log WHO did the edit (Admin) and WHO was edited ($new_name)
-        $details = "Updated member: " . $new_name . " (Role: " . $new_role . ")";
-        logActivity($conn, $_SESSION['id'], $_SESSION['name'], 'Edit Member', $details);
-    }
     
     // Redirect back to list
     header("Location: user_page.php");

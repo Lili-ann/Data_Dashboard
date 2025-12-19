@@ -3,13 +3,16 @@ session_start();
 require_once 'config.php';
 
 // 1. SECURITY CHECK
+// Check to make sure user that log in has 'email' session
+// If not they are redirected into index.php
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
-// 2. FETCH LOGS + JOIN USER TABLE
-// We join the 'user' table so we can see the CURRENT name, not the old one.
+// 2. FETCH LOGS
+// We join the 'user' table with 'log', this is to ensure any name changes
+// will lead to the log showing new name instead of old.
 $sql = "SELECT activity_log.*, user.name AS current_name 
         FROM activity_log 
         LEFT JOIN user ON activity_log.user_id = user.id 
@@ -45,6 +48,8 @@ $result = $conn->query($sql);
             <div class="logs-box">
                 
                 <?php if ($result->num_rows > 0): ?>
+                    <!-- This is where the loop comes in, looping every row returned
+                     by the database -->
                     <?php while($row = $result->fetch_assoc()): ?>
                         
                         <?php 
@@ -53,6 +58,7 @@ $result = $conn->query($sql);
                             $display_name = !empty($row['current_name']) ? $row['current_name'] : $row['user_name'];
                         ?>
 
+                        <!-- Style used for all the logs shown -->
                         <div class="log-line">
                             <span style="float: right; font-size: 11px; color: #666; margin-top: 2px;">
                                 <?php echo date('d M, H:i', strtotime($row['created_at'])); ?>
