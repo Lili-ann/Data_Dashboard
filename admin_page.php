@@ -22,13 +22,14 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['role']) || strtolower($_SESS
     <div class="overlay"></div>
 
     <div class="user-container">
-        
+        <!-- Header makes use of a standard style that all headers in all pages use from style.css -->
         <div class="header" style="justify-content: center;">
             <div class="header-title">ADMIN HUB</div>
         </div>
 
         <div class="content" style="display: flex; flex-direction: column; justify-content: center; padding-top: 50px;">
     
+        <!-- href leads to the necessary pages that the buttons are supposed to route the Admins towards -->
     <a href="user_page.php" class="card" style="text-decoration: none; cursor: pointer;">
         <div class="card-left">
             <span class="student-name">Manage Members</span>
