@@ -163,8 +163,10 @@ $status_options = ['Present', 'Absent', 'Pending'];
                     </span>
                 </div>
             </div>
-
+	    <!-- The Save Button (when you click it, the data will sent securely-->
+	    <!-- Data Loop, which when we click save, it will called attendees_result to the person -->
             <form method="POST"> 
+		 <!-- Data Loop, which when we click save, it will called attendees_result to the person -->
                 <?php while($person = $attendees_result->fetch_assoc()): ?>
                 <div class="dropdowncard">
                     
@@ -177,8 +179,11 @@ $status_options = ['Present', 'Absent', 'Pending'];
 
                     <div class="dropdowncard-right">
                         <div class="select-wrapper">
+			    <!-- This allows you to know exactly whichstatus belongs to which person when you process the form -->
                             <select name="status[<?php echo $person['id']; ?>]">
                                 <option value="">-- Select --</option>
+				 <!-- It loops through a predefined list of statuses (Present, Absent, and Pending) -->
+				<!-- The code checks if the person's current status ini the database matches the current optipn in the loop -->
                                 <?php foreach($status_options as $option): ?>
                                     <option value="<?php echo $option; ?>" 
                                         <?php echo ($person['status'] == $option) ? 'selected' : ''; ?>>
@@ -192,6 +197,7 @@ $status_options = ['Present', 'Absent', 'Pending'];
                 <?php endwhile; ?>
 
                 <div class="save-btn-container">
+		     <!-- when clicked, this sends all the dropdown selections to the server at once-->
                     <button type="submit" name="save_attendance" class="btn-save">Save Attendance</button>
                 </div>
 

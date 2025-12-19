@@ -2,6 +2,8 @@
 session_start();
 require_once 'config.php';
 
+//This is for security, to make user, manager, and admin go to//
+//index.php for login and register the email//
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
@@ -35,21 +37,24 @@ $result = $conn->query($sql);
     <div class="overlay"></div>
     
     <div class="user-container">
-        
+    <!-- // button back, and  logout which the beetwen of this two button "Meeting List"-->
         <div class="header">
             <?php if ($isAdmin): ?>
                 <a href="admin_page.php" class="header-btn">Back</a>
             <?php else: ?>
                  <a href="index.php" class="header-btn">Back</a>
             <?php endif; ?>
-            
+        <!-- // this is the button logout will make the user click it-->
+         <!-- // go to "logout.php"  -->
             <div class="header-title">Meeting List</div>
             <a href="logout.php" class="header-btn logout">Logout</a>
         </div>
-
+        <!-- // this it will check the database and make space it to 0 Rows -->
         <div class="content">
             <?php if ($result->num_rows > 0): ?>
-                <?php while($row = $result->fetch_assoc()): ?>
+                <!-- // looping as long as there is still data in the database which will be repeated every row (Update) -->
+                <?php while($row = $result->fetch_assoc()): ?> 
+                <!-- // -->
                 <div class="card">
                     <a href="attendance_list.php?id=<?php echo $row['id']; ?>" style="text-decoration: none; flex: 1; display: flex; color: inherit;">
                         <div class="card-left">
@@ -60,9 +65,11 @@ $result = $conn->query($sql);
                         </div>
                     </a>
                     <div class="card-right">
+  			<!-- // On the right side of the meeting card, in the "Room name" area  -->
                         <span class="room-text">
                             <i class="fa-solid fa-location-dot" style="margin-right:5px; color:#800000;"></i>
                             <?php 
+				<!-- // if the room name is blank, it will display TBA (To Be Announced).  -->
                                 echo !empty($row['room_name']) ? htmlspecialchars($row['room_name']) : 'TBA'; 
                             ?>
                         </span>
@@ -70,10 +77,13 @@ $result = $conn->query($sql);
                 </div>
                 <?php endwhile; ?>
             <?php else: ?>
+		<!-- //  for club locations, if there is no club name, it will display "No meeting found"  -->
                 <p style="text-align: center; color: #666; margin-top: 20px;">No meetings found.</p>
             <?php endif; ?>
 
             <?php if ($isAdmin): ?>
+		<!-- // are specifically for admins where they can create new clubs and change locations along with a save button. -->
+
                 <div class="save-btn-container" style="margin-top: 20px; padding-bottom: 20px;">
                     <a href="create_meeting.php" class="btn-save" style="text-decoration: none; display: inline-block;">
                         <i class="fas fa-plus" style="margin-right: 8px;"></i> Create New Meeting
