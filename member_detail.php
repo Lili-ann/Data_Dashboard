@@ -51,15 +51,15 @@ if (isset($_GET['id'])) {
 //and LEFT JOINing `venue` to retrieve the room name, if there's any.
 // then order by meeting time in descending order (most recent first)
 $att_sql = "SELECT 
-                attendance.status, --attendance status (Present, Absent, Pending)
-                schedule.meeting_name, --meeting name
-                schedule.meeting_time, --meeting time
-                venue.room_name -- Roomm Number
-            FROM attendance -- attendance table
-            JOIN schedule ON attendance.schedule_id = schedule.id -- join schedule table
-            LEFT JOIN venue ON schedule.id = venue.schedule_id -- left join venue table to get room number
-            WHERE attendance.user_id = ? --filter by user id
-            ORDER BY schedule.meeting_time DESC"; //order by meeting time descending
+                attendance.status, 
+                schedule.meeting_name, 
+                schedule.meeting_time, 
+                venue.room_name 
+            FROM attendance 
+            JOIN schedule ON attendance.schedule_id = schedule.id 
+            LEFT JOIN venue ON schedule.id = venue.schedule_id 
+            WHERE attendance.user_id = ? 
+            ORDER BY schedule.meeting_time DESC";
 
 $att_stmt = $conn->prepare($att_sql);
 //this binds the user id to the prepared statement as integer parameter to avoid SQL injection

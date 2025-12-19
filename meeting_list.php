@@ -69,7 +69,7 @@ $result = $conn->query($sql);
                         <span class="room-text">
                             <i class="fa-solid fa-location-dot" style="margin-right:5px; color:#800000;"></i>
                             <?php 
-				<!-- // if the room name is blank, it will display TBA (To Be Announced).  -->
+				 // if the room name is blank, it will display TBA (To Be Announced).
                                 echo !empty($row['room_name']) ? htmlspecialchars($row['room_name']) : 'TBA'; 
                             ?>
                         </span>

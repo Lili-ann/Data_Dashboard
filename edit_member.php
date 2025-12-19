@@ -62,6 +62,12 @@ if (isset($_POST['update_member'])) {
     $r_stmt->execute();
     $r_stmt->close();
     
+    // LOG THE UPDATE ACTION
+    if (function_exists('logActivity')) {
+        $log_action = "Updated member: " . $new_name . " (Role: " . $new_role . ")";
+        logActivity($conn, $_SESSION['id'], $_SESSION['name'], 'Update Member', $log_action);
+    }
+    
     // Redirect back to list
     header("Location: user_page.php");
     exit();
